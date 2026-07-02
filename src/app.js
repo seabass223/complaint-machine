@@ -49,7 +49,7 @@ function storyForIssue(issue){
 class ComplaintMap3D{
   constructor(container){
     this.container=container; this.meshes=[]; this.hovered=null; this.selected=null;
-    this.targetTilt = 0;
+    this.targetXRotation = 0;
     this.scene=new THREE.Scene();
     this.scene.fog=new THREE.Fog(0x0b1517, 600, 1400);
     this.camera=new THREE.PerspectiveCamera(45,1,1,3000);
@@ -59,7 +59,7 @@ class ComplaintMap3D{
     this.renderer.shadowMap.enabled=true;
     container.appendChild(this.renderer.domElement);
     this.controls=new OrbitControls(this.camera,this.renderer.domElement);
-    this.controls.enableDamping=true; this.controls.dampingFactor=.08; this.controls.target.set(0,0,20); this.controls.maxPolarAngle=Math.PI*.48; this.controls.minDistance=360; this.controls.maxDistance=1150;
+    this.controls.enableDamping=true; this.controls.dampingFactor=.08; this.controls.target.set(0,0,20); this.controls.minPolarAngle=0.05; this.controls.maxPolarAngle=Math.PI-0.05; this.controls.minDistance=360; this.controls.maxDistance=1150;
     this.raycaster=new THREE.Raycaster(); this.pointer=new THREE.Vector2();
     this.group=new THREE.Group(); this.scene.add(this.group);
     this.maxCount=Math.max(...Object.values(DATA.states).map(d=>d.count));
@@ -85,11 +85,11 @@ class ComplaintMap3D{
     const slider = $('xTilt');
     if(!slider) return;
     const setTilt = (value) => {
-      const degrees = Math.max(0, Math.min(58, Number(value) || 0));
+      const degrees = Math.max(-58, Math.min(58, Number(value) || 0));
       slider.value = String(degrees);
-      // Strong north/south depth rake: southern states (Texas) move toward the
-      // camera while northern states (North Dakota) recede from the viewer.
-      this.targetTilt = degrees / 58;
+      // Rotate the single cohesive state group on X, preserving state spacing
+      // and raycasting while allowing both negative and positive degrees.
+      this.targetXRotation = THREE.MathUtils.degToRad(degrees);
     };
     slider.addEventListener('input', () => setTilt(slider.value));
     document.querySelectorAll('[data-tilt]').forEach((button) => {
@@ -117,24 +117,10 @@ class ComplaintMap3D{
         this.group.add(mesh); this.meshes.push(mesh);
       }
     }
-    this.measureNorthSouthTilt();
     const box=new THREE.Box3().setFromObject(this.group); const center=box.getCenter(new THREE.Vector3());
-    this.group.position.set(-center.x,-center.y,-20); this.group.rotation.x=0;
+    this.group.position.set(-center.x,-center.y,-20); this.group.rotation.x=this.targetXRotation;
     this.group.scale.set(.74,.74,.74);
     this.selectState('CA');
-  }
-  measureNorthSouthTilt(){
-    const centers = this.meshes.map((mesh) => {
-      mesh.geometry.computeBoundingBox();
-      const center = mesh.geometry.boundingBox.getCenter(new THREE.Vector3());
-      mesh.userData.mapCenterY = center.y;
-      return center.y;
-    });
-    const minY = Math.min(...centers), maxY = Math.max(...centers), midY = (minY + maxY) / 2, span = Math.max(1, (maxY - minY) / 2);
-    this.meshes.forEach((mesh) => {
-      // +1 = north, -1 = south. South gets pulled toward the camera on -Y.
-      mesh.userData.northSouth = (mesh.userData.mapCenterY - midY) / span;
-    });
   }
   featureToShapes(feature, projection){
     const polys=feature.geometry.type==='Polygon' ? [feature.geometry.coordinates] : feature.geometry.coordinates;
@@ -177,15 +163,8 @@ class ComplaintMap3D{
   }
   animate(){
     requestAnimationFrame(()=>this.animate());
-    for(const m of this.meshes){
-      const ns = m.userData.northSouth || 0;
-      const rakeY = ns * 150 * this.targetTilt;
-      const rakeZ = -ns * 80 * this.targetTilt;
-      const targetY = m.userData.targetY + rakeY;
-      const targetZ = m.userData.targetZ + rakeZ;
-      m.position.z += (targetZ-m.position.z)*.09;
-      m.position.y += (targetY-m.position.y)*.09;
-    }
+    for(const m of this.meshes){ m.position.z += (m.userData.targetZ-m.position.z)*.09; m.position.y += (m.userData.targetY-m.position.y)*.09; }
+    this.group.rotation.x += (this.targetXRotation-this.group.rotation.x)*.12;
     this.controls.update(); this.renderer.render(this.scene,this.camera);
   }
 }
