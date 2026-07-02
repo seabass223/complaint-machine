@@ -38,7 +38,18 @@
             <p class="kicker">3D COMPLAINT ATLAS</p>
             <h2>Click a state. Make it testify.</h2>
           </div>
-          <p class="panel-copy">Hover highlights state geometry. Click pulls the state out of the map and opens its complaint dossier.</p>
+          <div class="map-tools" aria-label="3D map controls">
+            <p class="panel-copy">Hover highlights state geometry. Click pulls the state out of the map and opens its complaint dossier.</p>
+            <label class="tilt-control" for="xTilt">
+              <span>Rotate states backward</span>
+              <input id="xTilt" type="range" min="0" max="58" value="0" />
+            </label>
+            <div class="tilt-buttons">
+              <button type="button" data-tilt="0">flat</button>
+              <button type="button" data-tilt="28">lean</button>
+              <button type="button" data-tilt="50">poster wall</button>
+            </div>
+          </div>
         </div>
         <div class="machine-layout">
           <div id="scene" aria-label="Interactive 3D extruded map of United States complaint volume"></div>
