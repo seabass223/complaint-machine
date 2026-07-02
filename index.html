@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Complaint Machine: a Data Punk 3D atlas of CFPB consumer finance complaints." />
+    <title>Complaint Machine</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <header class="hero">
+      <nav class="topline">
+        <a class="badge" href="https://catalog.data.gov/dataset/consumer-complaint-database" target="_blank" rel="noreferrer">DATA.GOV · CFPB COMPLAINTS</a>
+        <a href="https://www.consumerfinance.gov/data-research/consumer-complaints/" target="_blank" rel="noreferrer">CFPB source ↗</a>
+      </nav>
+      <section class="hero-grid">
+        <div>
+          <p class="kicker">FINE PRINT RIOT / CONSUMER FINANCE</p>
+          <h1>Complaint Machine</h1>
+          <p class="lede">A 3D protest map of Americans yelling into the financial system: credit bureaus, debt collectors, banks, lenders, and customer support labyrinths.</p>
+        </div>
+        <aside class="receipt">
+          <strong>PUBLIC LINKS</strong>
+          <span>Data.gov: Consumer Complaint Database</span>
+          <span>Bulk CSV: CFPB complaint archive</span>
+          <span>Prototype sample: <b id="sampleRows">loading…</b></span>
+        </aside>
+      </section>
+    </header>
+
+    <main>
+      <section class="stats-grid" id="stats"></section>
+
+      <section class="panel map-panel">
+        <div class="panel-head">
+          <div>
+            <p class="kicker">3D COMPLAINT ATLAS</p>
+            <h2>Click a state. Make it testify.</h2>
+          </div>
+          <p class="panel-copy">Hover highlights state geometry. Click pulls the state out of the map and opens its complaint dossier.</p>
+        </div>
+        <div class="machine-layout">
+          <div id="scene" aria-label="Interactive 3D extruded map of United States complaint volume"></div>
+          <aside class="state-dossier" id="dossier">
+            <p class="kicker">SELECTED STATE</p>
+            <h3 id="stateName">Hover the machine</h3>
+            <p id="stateCaption">Click a state to raise it from the map and read its complaint profile.</p>
+            <div class="big-number"><span id="stateCount">—</span><small>complaints in prototype sample</small></div>
+            <div id="stateDetails" class="detail-stack"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="split">
+        <article class="panel">
+          <p class="kicker">PRODUCT PAIN WALL</p>
+          <h2>What people complain about</h2>
+          <div id="productWall" class="poster-grid"></div>
+        </article>
+        <article class="panel">
+          <p class="kicker">MOST NAMED COMPANIES</p>
+          <h2>Wanted posters, statistically speaking</h2>
+          <div id="companyBoard" class="rank-board"></div>
+        </article>
+      </section>
+
+      <section class="panel zine">
+        <p class="kicker">COMPLAINT STORIES, SORT OF</p>
+        <h2>The public narratives are often redacted, but the issues are loud.</h2>
+        <div id="storyCards" class="story-grid"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Built for Summer Into AI: Data Punk. Data: Consumer Financial Protection Bureau Consumer Complaint Database via Data.gov. This prototype aggregates a streamed public sample and uses complaint counts/issues, not private data.</p>
+    </footer>
+
+    <script src="./src/data.js"></script>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
