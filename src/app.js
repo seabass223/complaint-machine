@@ -49,25 +49,26 @@ function storyForIssue(issue){
 class ComplaintMap3D{
   constructor(container){
     this.container=container; this.meshes=[]; this.hovered=null; this.selected=null;
-    this.initialXRotation = THREE.MathUtils.degToRad(-5);
+    this.lockedView = {
+      cameraPosition: new THREE.Vector3(18.33, -296.18, 824.73),
+      controlsTarget: new THREE.Vector3(10.72, -163.29, 0.95),
+      groupPosition: new THREE.Vector3(37.37, 3.74, -20),
+      groupRotation: new THREE.Euler(THREE.MathUtils.degToRad(-5), 0, 0),
+      groupScale: new THREE.Vector3(0.74, 0.74, 0.74)
+    };
     this.equalStateDepth = 42;
-    this.viewReadout = $('viewReadout');
     this.scene=new THREE.Scene();
     this.scene.fog=new THREE.Fog(0x04031f, 520, 1350);
     this.camera=new THREE.PerspectiveCamera(45,1,1,3000);
-    this.camera.position.set(0,-720,520);
+    this.camera.position.copy(this.lockedView.cameraPosition);
     this.renderer=new THREE.WebGLRenderer({antialias:true, alpha:true});
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));
     this.renderer.shadowMap.enabled=true;
     container.appendChild(this.renderer.domElement);
     this.controls=new OrbitControls(this.camera,this.renderer.domElement);
-    this.controls.enableDamping=true; this.controls.dampingFactor=.08;
-    this.controls.enableRotate=true; this.controls.enablePan=true; this.controls.enableZoom=true;
-    this.controls.screenSpacePanning=true;
-    this.controls.minPolarAngle=0.01; this.controls.maxPolarAngle=Math.PI-0.01;
-    this.controls.minAzimuthAngle=-Infinity; this.controls.maxAzimuthAngle=Infinity;
-    this.controls.minDistance=160; this.controls.maxDistance=1600;
-    this.controls.target.set(0,0,20);
+    this.controls.enableDamping=false; this.controls.enableRotate=false; this.controls.enablePan=false; this.controls.enableZoom=false;
+    this.controls.target.copy(this.lockedView.controlsTarget);
+    this.camera.lookAt(this.controls.target);
     this.raycaster=new THREE.Raycaster(); this.pointer=new THREE.Vector2();
     this.group=new THREE.Group(); this.scene.add(this.group);
     this.maxCount=Math.max(...Object.values(DATA.states).map(d=>d.count));
@@ -83,7 +84,7 @@ class ComplaintMap3D{
     const blue=new THREE.PointLight(0x2878ff,.9,900); blue.position.set(120,-500,260); this.scene.add(blue);
   }
   addBase(){
-    const grid=new THREE.GridHelper(980,22,0xff1bbd,0x183b88); grid.rotation.x=Math.PI/2; grid.position.z=-10; this.scene.add(grid);
+    // Grid intentionally removed so the USA floats cleanly in the neon scene.
   }
   bind(){
     window.addEventListener('resize',()=>this.resize());
@@ -111,9 +112,9 @@ class ComplaintMap3D{
         this.group.add(mesh); this.meshes.push(mesh);
       }
     }
-    const box=new THREE.Box3().setFromObject(this.group); const center=box.getCenter(new THREE.Vector3());
-    this.group.position.set(-center.x,-center.y,-20); this.group.rotation.x=this.initialXRotation;
-    this.group.scale.set(.74,.74,.74);
+    this.group.position.copy(this.lockedView.groupPosition);
+    this.group.rotation.copy(this.lockedView.groupRotation);
+    this.group.scale.copy(this.lockedView.groupScale);
     this.selectState('CA');
   }
   featureToShapes(feature, projection){
@@ -138,7 +139,7 @@ class ComplaintMap3D{
   }
   setPointer(e){ const r=this.renderer.domElement.getBoundingClientRect(); this.pointer.x=((e.clientX-r.left)/r.width)*2-1; this.pointer.y=-((e.clientY-r.top)/r.height)*2+1; }
   intersect(){ this.raycaster.setFromCamera(this.pointer,this.camera); return this.raycaster.intersectObjects(this.meshes,false)[0]?.object; }
-  onMove(e){ this.setPointer(e); const hit=this.intersect(); if(hit!==this.hovered){ if(this.hovered && !this.hovered.userData.selected) this.hovered.material.emissive.set(0x070018); this.hovered=hit; if(hit && !hit.userData.selected) hit.material.emissive.set(0x2b0044); this.container.style.cursor=hit?'pointer':'grab'; } }
+  onMove(e){ this.setPointer(e); const hit=this.intersect(); if(hit!==this.hovered){ if(this.hovered && !this.hovered.userData.selected) this.hovered.material.emissive.set(0x070018); this.hovered=hit; if(hit && !hit.userData.selected) hit.material.emissive.set(0x2b0044); this.container.style.cursor=hit?'pointer':'default'; } }
   onClick(e){ this.setPointer(e); const hit=this.intersect(); if(hit) this.selectState(hit.userData.code); }
   selectState(code){
     for(const m of this.meshes){ m.userData.selected=false; m.userData.targetZ=0; m.userData.targetY=0; m.material.emissive.set(0x070018); }
@@ -155,27 +156,15 @@ class ComplaintMap3D{
       <div class="detail"><b>Most named company</b><span>${d.topCompany}</span></div>
       <div class="detail"><b>Issue stack</b><span>${d.issues.slice(0,3).map(x=>`${x[0]} (${fmt.format(x[1])})`).join('<br>')}</span></div>`;
   }
-  updateReadout(){
-    if(!this.viewReadout) return;
-    const deg = (r) => +(THREE.MathUtils.radToDeg(r)).toFixed(2);
-    const pos = (v) => ({x:+v.x.toFixed(2), y:+v.y.toFixed(2), z:+v.z.toFixed(2)});
-    const distance = +this.camera.position.distanceTo(this.controls.target).toFixed(2);
-    this.viewReadout.textContent = [
-      'COPY THESE 3D VALUES',
-      `camera.position = ${JSON.stringify(pos(this.camera.position))}`,
-      `camera.rotationDeg = ${JSON.stringify({x:deg(this.camera.rotation.x), y:deg(this.camera.rotation.y), z:deg(this.camera.rotation.z)})}`,
-      `controls.target = ${JSON.stringify(pos(this.controls.target))}`,
-      `camera.distance = ${distance}`,
-      `group.position = ${JSON.stringify(pos(this.group.position))}`,
-      `group.rotationDeg = ${JSON.stringify({x:deg(this.group.rotation.x), y:deg(this.group.rotation.y), z:deg(this.group.rotation.z)})}`,
-      `group.scale = ${JSON.stringify(pos(this.group.scale))}`,
-      `stateExtrudeDepth = ${this.equalStateDepth}`
-    ].join('\n');
-  }
   animate(){
     requestAnimationFrame(()=>this.animate());
     for(const m of this.meshes){ m.position.z += (m.userData.targetZ-m.position.z)*.09; m.position.y += (m.userData.targetY-m.position.y)*.09; }
-    this.controls.update(); this.updateReadout(); this.renderer.render(this.scene,this.camera);
+    this.camera.position.copy(this.lockedView.cameraPosition);
+    this.controls.target.copy(this.lockedView.controlsTarget);
+    this.group.position.copy(this.lockedView.groupPosition);
+    this.group.rotation.copy(this.lockedView.groupRotation);
+    this.group.scale.copy(this.lockedView.groupScale);
+    this.controls.update(); this.renderer.render(this.scene,this.camera);
   }
 }
 
