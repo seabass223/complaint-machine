@@ -52,7 +52,7 @@ class ComplaintMap3D{
     this.lockedView = {
       cameraPosition: new THREE.Vector3(18.33, -296.18, 824.73),
       controlsTarget: new THREE.Vector3(10.72, -163.29, 0.95),
-      groupPosition: new THREE.Vector3(37.37, 3.74, -20),
+      groupPosition: new THREE.Vector3(37.37, -146.26, -20),
       groupRotation: new THREE.Euler(THREE.MathUtils.degToRad(-5), 0, 0),
       groupScale: new THREE.Vector3(0.74, 0.74, 0.74)
     };
