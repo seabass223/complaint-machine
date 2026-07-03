@@ -63,6 +63,16 @@ class ComplaintMap3D{
       groupRotation: new THREE.Euler(THREE.MathUtils.degToRad(-5), 0, 0),
       groupScale: new THREE.Vector3(0.74, 0.74, 0.74)
     };
+    // Desktop is intentionally locked to the approved composition above.
+    // This mobile-only view keeps the same angle, but pulls the map back so
+    // the full USA fits inside the narrow phone canvas.
+    this.mobileLockedView = {
+      cameraPosition: this.lockedView.cameraPosition.clone(),
+      controlsTarget: this.lockedView.controlsTarget.clone(),
+      groupPosition: new THREE.Vector3(44, -145, -20),
+      groupRotation: this.lockedView.groupRotation.clone(),
+      groupScale: new THREE.Vector3(0.60, 0.60, 0.60)
+    };
     this.equalStateDepth = 42;
     this.scene=new THREE.Scene();
     this.scene.fog=new THREE.Fog(0x04031f, 520, 1350);
@@ -99,8 +109,20 @@ class ComplaintMap3D{
     this.renderer.domElement.addEventListener('click',e=>this.onClick(e));
   }
 
+  activeView(){
+    return this.container.getBoundingClientRect().width <= 560 ? this.mobileLockedView : this.lockedView;
+  }
+  applyView(){
+    const view=this.activeView();
+    this.camera.position.copy(view.cameraPosition);
+    this.controls.target.copy(view.controlsTarget);
+    this.group.position.copy(view.groupPosition);
+    this.group.rotation.copy(view.groupRotation);
+    this.group.scale.copy(view.groupScale);
+    this.camera.lookAt(this.controls.target);
+  }
   resize(){
-    const r=this.container.getBoundingClientRect(); this.camera.aspect=r.width/r.height; this.camera.updateProjectionMatrix(); this.renderer.setSize(r.width,r.height,false);
+    const r=this.container.getBoundingClientRect(); this.camera.aspect=r.width/r.height; this.camera.updateProjectionMatrix(); this.renderer.setSize(r.width,r.height,false); this.applyView();
   }
   build(geojson){
     const projection=geoAlbersUsa().scale(1180).translate([0,0]);
@@ -166,11 +188,12 @@ class ComplaintMap3D{
   animate(){
     requestAnimationFrame(()=>this.animate());
     for(const m of this.meshes){ m.position.z += (m.userData.targetZ-m.position.z)*.09; m.position.y += (m.userData.targetY-m.position.y)*.09; }
-    this.camera.position.copy(this.lockedView.cameraPosition);
-    this.controls.target.copy(this.lockedView.controlsTarget);
-    this.group.position.copy(this.lockedView.groupPosition);
-    this.group.rotation.copy(this.lockedView.groupRotation);
-    this.group.scale.copy(this.lockedView.groupScale);
+    const view=this.activeView();
+    this.camera.position.copy(view.cameraPosition);
+    this.controls.target.copy(view.controlsTarget);
+    this.group.position.copy(view.groupPosition);
+    this.group.rotation.copy(view.groupRotation);
+    this.group.scale.copy(view.groupScale);
     this.controls.update(); this.renderer.render(this.scene,this.camera);
   }
 }
