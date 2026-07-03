@@ -110,7 +110,10 @@ class ComplaintMap3D{
   }
 
   activeView(){
-    return this.container.getBoundingClientRect().width <= 560 ? this.mobileLockedView : this.lockedView;
+    const sceneWidth=this.container.getBoundingClientRect().width;
+    const viewportWidth=Math.min(window.innerWidth || sceneWidth, document.documentElement.clientWidth || sceneWidth);
+    const shouldUseMobileView=viewportWidth <= 900 || sceneWidth <= 760 || window.matchMedia('(max-width: 900px)').matches;
+    return shouldUseMobileView ? this.mobileLockedView : this.lockedView;
   }
   applyView(){
     const view=this.activeView();
