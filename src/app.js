@@ -49,7 +49,8 @@ function storyForIssue(issue){
 class ComplaintMap3D{
   constructor(container){
     this.container=container; this.meshes=[]; this.hovered=null; this.selected=null;
-    this.targetXRotation = 0;
+    this.lockedXRotation = THREE.MathUtils.degToRad(-35);
+    this.targetXRotation = this.lockedXRotation;
     this.scene=new THREE.Scene();
     this.scene.fog=new THREE.Fog(0x04031f, 520, 1350);
     this.camera=new THREE.PerspectiveCamera(45,1,1,3000);
@@ -59,11 +60,12 @@ class ComplaintMap3D{
     this.renderer.shadowMap.enabled=true;
     container.appendChild(this.renderer.domElement);
     this.controls=new OrbitControls(this.camera,this.renderer.domElement);
-    this.controls.enableDamping=true; this.controls.dampingFactor=.08; this.controls.target.set(0,0,20); this.controls.minPolarAngle=0.05; this.controls.maxPolarAngle=Math.PI-0.05; this.controls.minDistance=360; this.controls.maxDistance=1150;
+    this.controls.enableDamping=false; this.controls.enableRotate=false; this.controls.enablePan=false; this.controls.enableZoom=false;
+    this.controls.target.set(0,0,20);
     this.raycaster=new THREE.Raycaster(); this.pointer=new THREE.Vector2();
     this.group=new THREE.Group(); this.scene.add(this.group);
     this.maxCount=Math.max(...Object.values(DATA.states).map(d=>d.count));
-    this.addLights(); this.addBase(); this.bind(); this.bindTiltControls(); this.resize();
+    this.addLights(); this.addBase(); this.bind(); this.resize();
     fetch('./src/us-states.json').then(r=>r.json()).then(g=>this.build(g));
     requestAnimationFrame(()=>this.animate());
   }
@@ -82,22 +84,7 @@ class ComplaintMap3D{
     this.renderer.domElement.addEventListener('pointermove',e=>this.onMove(e));
     this.renderer.domElement.addEventListener('click',e=>this.onClick(e));
   }
-  bindTiltControls(){
-    const slider = $('xTilt');
-    if(!slider) return;
-    const setTilt = (value) => {
-      const degrees = Math.max(-58, Math.min(58, Number(value) || 0));
-      slider.value = String(degrees);
-      // Rotate the single cohesive state group on X, preserving state spacing
-      // and raycasting while allowing both negative and positive degrees.
-      this.targetXRotation = THREE.MathUtils.degToRad(degrees);
-    };
-    slider.addEventListener('input', () => setTilt(slider.value));
-    document.querySelectorAll('[data-tilt]').forEach((button) => {
-      button.addEventListener('click', () => setTilt(button.dataset.tilt));
-    });
-    setTilt(slider.value);
-  }
+
   resize(){
     const r=this.container.getBoundingClientRect(); this.camera.aspect=r.width/r.height; this.camera.updateProjectionMatrix(); this.renderer.setSize(r.width,r.height,false);
   }
@@ -119,7 +106,7 @@ class ComplaintMap3D{
       }
     }
     const box=new THREE.Box3().setFromObject(this.group); const center=box.getCenter(new THREE.Vector3());
-    this.group.position.set(-center.x,-center.y,-20); this.group.rotation.x=this.targetXRotation;
+    this.group.position.set(-center.x,-center.y,-20); this.group.rotation.x=this.lockedXRotation;
     this.group.scale.set(.74,.74,.74);
     this.selectState('CA');
   }
@@ -145,7 +132,7 @@ class ComplaintMap3D{
   }
   setPointer(e){ const r=this.renderer.domElement.getBoundingClientRect(); this.pointer.x=((e.clientX-r.left)/r.width)*2-1; this.pointer.y=-((e.clientY-r.top)/r.height)*2+1; }
   intersect(){ this.raycaster.setFromCamera(this.pointer,this.camera); return this.raycaster.intersectObjects(this.meshes,false)[0]?.object; }
-  onMove(e){ this.setPointer(e); const hit=this.intersect(); if(hit!==this.hovered){ if(this.hovered && !this.hovered.userData.selected) this.hovered.material.emissive.set(0x070018); this.hovered=hit; if(hit && !hit.userData.selected) hit.material.emissive.set(0x2b0044); this.container.style.cursor=hit?'pointer':'grab'; } }
+  onMove(e){ this.setPointer(e); const hit=this.intersect(); if(hit!==this.hovered){ if(this.hovered && !this.hovered.userData.selected) this.hovered.material.emissive.set(0x070018); this.hovered=hit; if(hit && !hit.userData.selected) hit.material.emissive.set(0x2b0044); this.container.style.cursor=hit?'pointer':'default'; } }
   onClick(e){ this.setPointer(e); const hit=this.intersect(); if(hit) this.selectState(hit.userData.code); }
   selectState(code){
     for(const m of this.meshes){ m.userData.selected=false; m.userData.targetZ=0; m.userData.targetY=0; m.material.emissive.set(0x070018); }
@@ -165,7 +152,7 @@ class ComplaintMap3D{
   animate(){
     requestAnimationFrame(()=>this.animate());
     for(const m of this.meshes){ m.position.z += (m.userData.targetZ-m.position.z)*.09; m.position.y += (m.userData.targetY-m.position.y)*.09; }
-    this.group.rotation.x += (this.targetXRotation-this.group.rotation.x)*.12;
+    this.group.rotation.x = this.lockedXRotation;
     this.controls.update(); this.renderer.render(this.scene,this.camera);
   }
 }
