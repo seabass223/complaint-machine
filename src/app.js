@@ -125,7 +125,7 @@ class ComplaintMap3D{
     this.camera.lookAt(this.controls.target);
   }
   resize(){
-    const r=this.container.getBoundingClientRect(); this.camera.aspect=r.width/r.height; this.camera.updateProjectionMatrix(); this.renderer.setSize(r.width,r.height,false); this.applyView();
+    const r=this.container.getBoundingClientRect(); this.camera.aspect=r.width/r.height; this.camera.updateProjectionMatrix(); this.renderer.setSize(r.width,r.height,true); this.applyView();
   }
   build(geojson){
     const projection=geoAlbersUsa().scale(1180).translate([0,0]);
