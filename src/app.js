@@ -49,7 +49,7 @@ function storyForIssue(issue){
 class ComplaintMap3D{
   constructor(container){
     this.container=container; this.meshes=[]; this.hovered=null; this.selected=null;
-    this.lockedXRotation = THREE.MathUtils.degToRad(-35);
+    this.lockedXRotation = THREE.MathUtils.degToRad(-5);
     this.targetXRotation = this.lockedXRotation;
     this.scene=new THREE.Scene();
     this.scene.fog=new THREE.Fog(0x04031f, 520, 1350);
