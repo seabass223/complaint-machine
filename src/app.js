@@ -51,7 +51,7 @@ class ComplaintMap3D{
     this.container=container; this.meshes=[]; this.hovered=null; this.selected=null;
     this.targetXRotation = 0;
     this.scene=new THREE.Scene();
-    this.scene.fog=new THREE.Fog(0x0b1517, 600, 1400);
+    this.scene.fog=new THREE.Fog(0x04031f, 520, 1350);
     this.camera=new THREE.PerspectiveCamera(45,1,1,3000);
     this.camera.position.set(0,-720,520);
     this.renderer=new THREE.WebGLRenderer({antialias:true, alpha:true});
@@ -68,13 +68,14 @@ class ComplaintMap3D{
     requestAnimationFrame(()=>this.animate());
   }
   addLights(){
-    this.scene.add(new THREE.AmbientLight(0xfff1c2,.85));
-    const key=new THREE.DirectionalLight(0xffffff,1.25); key.position.set(-240,-280,600); key.castShadow=true; this.scene.add(key);
-    const pink=new THREE.PointLight(0xff0f8f,1.2,900); pink.position.set(-420,-360,260); this.scene.add(pink);
-    const yellow=new THREE.PointLight(0xffe600,.8,800); yellow.position.set(360,80,300); this.scene.add(yellow);
+    this.scene.add(new THREE.AmbientLight(0x26105a,.95));
+    const key=new THREE.DirectionalLight(0x37f6ff,1.35); key.position.set(-240,-280,600); key.castShadow=true; this.scene.add(key);
+    const pink=new THREE.PointLight(0xff1bbd,1.75,950); pink.position.set(-420,-360,280); this.scene.add(pink);
+    const orange=new THREE.PointLight(0xff7a2f,1.15,850); orange.position.set(320,120,360); this.scene.add(orange);
+    const blue=new THREE.PointLight(0x2878ff,.9,900); blue.position.set(120,-500,260); this.scene.add(blue);
   }
   addBase(){
-    const grid=new THREE.GridHelper(900,18,0xffe600,0x23454a); grid.rotation.x=Math.PI/2; grid.position.z=-5; this.scene.add(grid);
+    const grid=new THREE.GridHelper(980,22,0xff1bbd,0x183b88); grid.rotation.x=Math.PI/2; grid.position.z=-10; this.scene.add(grid);
   }
   bind(){
     window.addEventListener('resize',()=>this.resize());
@@ -102,8 +103,8 @@ class ComplaintMap3D{
   }
   build(geojson){
     const projection=geoAlbersUsa().scale(1180).translate([0,0]);
-    const materialBase=new THREE.MeshStandardMaterial({color:0xf4f0e9, roughness:.72, metalness:.05, emissive:0x000000});
-    const edgeMat=new THREE.LineBasicMaterial({color:0x111111, transparent:true, opacity:.55});
+    const materialBase=new THREE.MeshStandardMaterial({color:0x18f7ff, roughness:.42, metalness:.22, emissive:0x070018});
+    const edgeMat=new THREE.LineBasicMaterial({color:0x18f7ff, transparent:true, opacity:.72});
     for(const f of geojson.features){
       const code=nameToCode[f.properties.name]; if(!code || !DATA.states[code]) continue;
       const state=DATA.states[code];
@@ -140,16 +141,16 @@ class ComplaintMap3D{
   }
   colorForCount(count){
     const t=count/this.maxCount;
-    if(t>.65) return 0xff2a2a; if(t>.35) return 0xff7a1a; if(t>.18) return 0xffe600; if(t>.08) return 0xfff2cf; return 0xd8d8d8;
+    if(t>.65) return 0xff3f8f; if(t>.35) return 0xff7a2f; if(t>.18) return 0x7b1dff; if(t>.08) return 0x18f7ff; return 0x2852ff;
   }
   setPointer(e){ const r=this.renderer.domElement.getBoundingClientRect(); this.pointer.x=((e.clientX-r.left)/r.width)*2-1; this.pointer.y=-((e.clientY-r.top)/r.height)*2+1; }
   intersect(){ this.raycaster.setFromCamera(this.pointer,this.camera); return this.raycaster.intersectObjects(this.meshes,false)[0]?.object; }
-  onMove(e){ this.setPointer(e); const hit=this.intersect(); if(hit!==this.hovered){ if(this.hovered && !this.hovered.userData.selected) this.hovered.material.emissive.set(0x000000); this.hovered=hit; if(hit && !hit.userData.selected) hit.material.emissive.set(0x443300); this.container.style.cursor=hit?'pointer':'grab'; } }
+  onMove(e){ this.setPointer(e); const hit=this.intersect(); if(hit!==this.hovered){ if(this.hovered && !this.hovered.userData.selected) this.hovered.material.emissive.set(0x070018); this.hovered=hit; if(hit && !hit.userData.selected) hit.material.emissive.set(0x2b0044); this.container.style.cursor=hit?'pointer':'grab'; } }
   onClick(e){ this.setPointer(e); const hit=this.intersect(); if(hit) this.selectState(hit.userData.code); }
   selectState(code){
-    for(const m of this.meshes){ m.userData.selected=false; m.userData.targetZ=0; m.userData.targetY=0; m.material.emissive.set(0x000000); }
+    for(const m of this.meshes){ m.userData.selected=false; m.userData.targetZ=0; m.userData.targetY=0; m.material.emissive.set(0x070018); }
     const selected=this.meshes.filter(m=>m.userData.code===code);
-    selected.forEach(m=>{m.userData.selected=true; m.userData.targetZ=95; m.userData.targetY=-45; m.material.emissive.set(0x550015);});
+    selected.forEach(m=>{m.userData.selected=true; m.userData.targetZ=95; m.userData.targetY=-45; m.material.emissive.set(0x4f0050);});
     this.selected=selected[0]; this.updateDossier(code);
   }
   updateDossier(code){
