@@ -12,23 +12,9 @@
     <header class="hero">
       <nav class="topline">
         <a class="badge" href="https://advisoryhour.substack.com/p/summer-into-ai-week-3-theme-datapunk" target="_blank" rel="noreferrer">Summer Into AI - Week 3</a>
-        <span class="nav-links">
-          <a href="https://catalog.data.gov/dataset/consumer-complaint-database" target="_blank" rel="noreferrer">DATA.GOV · CFPB COMPLAINTS</a>
-          <a href="https://www.consumerfinance.gov/data-research/consumer-complaints/" target="_blank" rel="noreferrer">CFPB source ↗</a>
-        </span>
       </nav>
-      <section class="hero-grid">
-        <div>
-          <p class="kicker">FINE PRINT RIOT / CONSUMER FINANCE</p>
-          <h1>Complaint Machine</h1>
-          <p class="lede">A 3D protest map of Americans yelling into the financial system: credit bureaus, debt collectors, banks, lenders, and customer support labyrinths.</p>
-        </div>
-        <aside class="receipt">
-          <strong>PUBLIC LINKS</strong>
-          <span>Data.gov: Consumer Complaint Database</span>
-          <span>Bulk CSV: CFPB complaint archive</span>
-          <span>Prototype sample: <b id="sampleRows">loading…</b></span>
-        </aside>
+      <section class="hero-banner" aria-label="Complaint Machine hero artwork">
+        <img src="./assets/complaint-machine-hero.png" alt="A punk collage poster reading A Dataset of Complaints, with credit bureaus, debt collectors, banks, lenders, and customer support imagery." />
       </section>
     </header>
 
@@ -73,7 +59,11 @@
     </main>
 
     <footer>
-      <p>Built for Summer Into AI: Data Punk. Data: Consumer Financial Protection Bureau Consumer Complaint Database via Data.gov. This prototype aggregates a streamed public sample and uses complaint counts/issues, not private data.</p>
+      <nav class="footer-links" aria-label="Data source links">
+        <a href="https://catalog.data.gov/dataset/consumer-complaint-database" target="_blank" rel="noreferrer">DATA.GOV · CFPB COMPLAINTS</a>
+        <a href="https://www.consumerfinance.gov/data-research/consumer-complaints/" target="_blank" rel="noreferrer">CFPB source ↗</a>
+      </nav>
+      <p>Built for Summer Into AI: Data Punk. Data: Consumer Financial Protection Bureau Consumer Complaint Database via Data.gov. This prototype aggregates a streamed public sample and uses complaint counts/issues, not private data. Prototype sample: <b id="sampleRows">loading…</b>.</p>
     </footer>
 
     <script src="./src/data.js"></script>
