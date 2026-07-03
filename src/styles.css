@@ -19,10 +19,6 @@
   --font-display:Impact,Haettenschweiler,"Arial Black",system-ui,sans-serif;
   --font-body:"Trebuchet MS",Arial,sans-serif;
 }
-@keyframes wave-drift{
-  from{background-position:0 0,0 0,0 0}
-  to{background-position:0 150px,0 220px,0 0}
-}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;background:#02031a}
 body{
@@ -45,8 +41,7 @@ body:before{
   z-index:0;
   opacity:.95;
   background:
-    radial-gradient(circle at 50% 25%, #ff7b2f 0 8.9rem, transparent 9rem),
-    repeating-linear-gradient(0deg, transparent 0 25px, rgba(82,0,102,.72) 26px 35px, transparent 36px 54px),
+    radial-gradient(circle at 50% 25%, #ff7b2f 0 8.9rem, rgba(255,27,189,.24) 9rem 14rem, transparent 18rem),
     radial-gradient(circle at 10% 17%, rgba(255,27,189,.42) 0 1px, transparent 2px),
     radial-gradient(circle at 25% 9%, rgba(255,255,255,.9) 0 1px, transparent 2px),
     radial-gradient(circle at 73% 14%, rgba(255,255,255,.8) 0 1px, transparent 2px),
@@ -57,14 +52,12 @@ body:before{
 }
 body:after{
   z-index:1;
-  opacity:.82;
-  background-image:
-    url("data:image/svg+xml,%3Csvg width='260' height='150' viewBox='0 0 260 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2318f7ff' stroke-opacity='.34' stroke-width='1.15'%3E%3Cpath d='M-20 12 C 28 2 58 22 104 12 S 188 2 280 12'/%3E%3Cpath d='M-20 38 C 30 28 58 48 104 38 S 188 28 280 38'/%3E%3Cpath d='M-20 64 C 30 54 58 74 104 64 S 188 54 280 64'/%3E%3Cpath d='M-20 90 C 30 80 58 100 104 90 S 188 80 280 90'/%3E%3Cpath d='M-20 116 C 30 106 58 126 104 116 S 188 106 280 116'/%3E%3Cpath d='M-20 142 C 30 132 58 152 104 142 S 188 132 280 142'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg width='320' height='220' viewBox='0 0 320 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ff1bbd' stroke-opacity='.20' stroke-width='1'%3E%3Cpath d='M-30 24 C 38 44 70 4 128 24 S 230 44 350 24'/%3E%3Cpath d='M-30 74 C 38 94 70 54 128 74 S 230 94 350 74'/%3E%3Cpath d='M-30 124 C 38 144 70 104 128 124 S 230 144 350 124'/%3E%3Cpath d='M-30 174 C 38 194 70 154 128 174 S 230 194 350 174'/%3E%3C/g%3E%3C/svg%3E"),
-    linear-gradient(0deg, rgba(0,0,0,.9) 0 17%, transparent 17%);
-  background-size:260px 150px,320px 220px,100% 100%;
-  animation:wave-drift 28s linear infinite;
-  mask-image:linear-gradient(180deg,transparent 0 18%,#000 34%,#000 100%);
+  opacity:.5;
+  background:
+    radial-gradient(circle at 50% 62%,rgba(255,27,189,.22),transparent 30rem),
+    radial-gradient(circle at 50% 82%,rgba(24,247,255,.12),transparent 26rem),
+    linear-gradient(0deg,rgba(0,0,0,.82) 0 15%,transparent 52%);
+  mask-image:linear-gradient(180deg,transparent 0 24%,#000 48%,#000 100%);
 }
 .noise{
   z-index:5;
@@ -78,7 +71,7 @@ a{color:var(--cyan);font-weight:950;text-decoration:none;text-shadow:0 0 10px rg
 a:hover{color:#fff;background:rgba(255,27,189,.28)}
 .hero,main,footer{position:relative;z-index:2;width:min(1220px,calc(100% - 30px));margin:0 auto}
 .hero{padding:28px 0 12px;min-height:52vh;display:grid;align-items:end}
-.topline{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:38px}
+.topline{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:38px}.nav-links{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .badge,.kicker{display:inline-block;font-family:var(--font-display);letter-spacing:.16em;text-transform:uppercase;font-size:.78rem}
 .badge,.topline a{
   border:1px solid rgba(24,247,255,.72);
@@ -95,8 +88,7 @@ a:hover{color:#fff;background:rgba(255,27,189,.28)}
   left:4%;right:5%;bottom:-34px;height:210px;
   background:
     linear-gradient(180deg,transparent 0 22%,#030418 22% 100%),
-    repeating-linear-gradient(90deg,transparent 0 34px,rgba(24,247,255,.55) 35px 38px,transparent 39px 76px),
-    url("data:image/svg+xml,%3Csvg width='220' height='86' viewBox='0 0 220 86' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffb13b' stroke-opacity='.44' stroke-width='2'%3E%3Cpath d='M-10 18 C 26 8 48 28 82 18 S 146 8 230 18'/%3E%3Cpath d='M-10 45 C 26 35 48 55 82 45 S 146 35 230 45'/%3E%3Cpath d='M-10 72 C 26 62 48 82 82 72 S 146 62 230 72'/%3E%3C/g%3E%3C/svg%3E");
+    repeating-linear-gradient(90deg,transparent 0 34px,rgba(24,247,255,.55) 35px 38px,transparent 39px 76px);
   clip-path:polygon(0 100%,0 42%,5% 42%,5% 30%,10% 30%,10% 56%,15% 56%,15% 24%,21% 24%,21% 66%,28% 66%,28% 34%,34% 34%,34% 11%,40% 11%,40% 57%,47% 57%,47% 19%,54% 19%,54% 50%,60% 50%,60% 31%,67% 31%,67% 63%,73% 63%,73% 38%,80% 38%,80% 58%,87% 58%,87% 45%,93% 45%,93% 72%,100% 72%,100% 100%);
   opacity:.72;
   filter:drop-shadow(0 0 18px rgba(24,247,255,.45)) drop-shadow(0 0 22px rgba(255,27,189,.3));

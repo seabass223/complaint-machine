@@ -27,7 +27,7 @@ function initBoards(){
   $('productWall').innerHTML = DATA.products.slice(0,8).map(([name,count],i)=>`<div class="poster"><small>#${i+1} product</small><b>${shortProduct(name)}</b><p>${fmt.format(count)} complaints. ${snark(name)}</p></div>`).join('');
   $('companyBoard').innerHTML = DATA.companies.slice(0,10).map(([name,count],i)=>`<div class="rank-row"><b>${i+1}</b><span>${name}</span><b>${fmt.format(count)}</b></div>`).join('');
   const issueCards = DATA.issues.slice(0,9).map(([issue,count],i)=>({issue,count, text: issue}));
-  $('storyCards').innerHTML = issueCards.map((d,i)=>`<div class="story"><small>Issue #${i+1} · ${fmt.format(d.count)}</small><strong>${d.issue}</strong><p>${storyForIssue(d.issue)}</p></div>`).join('');
+  $('storyCards').innerHTML = issueCards.map((d,i)=>`<div class="story"><small>Issue #${i+1} · ${fmt.format(d.count)}</small><strong>${d.issue}</strong><p>${storyForIssue(d.issue, d.count)}</p></div>`).join('');
 }
 function shortProduct(s){return s.replace('Credit reporting or other personal consumer reports','Credit reporting').replace('Credit reporting, credit repair services, or other personal consumer reports','Credit reporting').replace('Money transfer, virtual currency, or money service','Money transfer / crypto').replace('Checking or savings account','Checking / savings');}
 function snark(s){
@@ -37,13 +37,20 @@ function snark(s){
   if(s.includes('Credit card')) return 'Plastic rectangle, plot twist included.';
   return 'Fine print found a new way to become a personality.';
 }
-function storyForIssue(issue){
-  if(/Incorrect information/i.test(issue)) return 'The file says one thing, the human says another, and somewhere a dispute portal asks for the same PDF again.';
-  if(/investigation/i.test(issue)) return 'The investigation went into a black box and came back wearing a corporate cardigan.';
-  if(/debt/i.test(issue)) return 'The debt may or may not be real, but the collection energy is extremely real.';
-  if(/account/i.test(issue)) return 'Account management: the thrilling sport of proving you are you to a form that disagrees.';
-  if(/payment/i.test(issue)) return 'The payment entered the maze. Customer service brought a flashlight with dead batteries.';
-  return 'A tiny bureaucratic goblin appears in the ledger and demands documentation.';
+function storyForIssue(issue, count){
+  const prefix = `${fmt.format(count)} complaints in this sample are coded here. `;
+  if(/Incorrect information/i.test(issue)) return prefix + 'Consumers are disputing records they say are inaccurate, incomplete, duplicated, outdated, or attached to the wrong person.';
+  if(/problem with.*investigation|investigation/i.test(issue)) return prefix + 'Consumers say the company did not adequately review, explain, or correct a dispute after they challenged the information.';
+  if(/debt.*not yours|debt/i.test(issue)) return prefix + 'These complaints involve collection activity, disputed debts, verification problems, or attempts to collect money the consumer says is not owed.';
+  if(/Improper use/i.test(issue)) return prefix + 'Consumers report their credit report or personal financial data was accessed, used, or shared in a way they believe was improper.';
+  if(/Problem with a company's investigation/i.test(issue)) return prefix + 'Consumers say the company response to a dispute did not resolve the underlying credit-reporting problem.';
+  if(/account/i.test(issue)) return prefix + 'Consumers are reporting trouble opening, closing, accessing, managing, or correcting a bank or financial account.';
+  if(/payment/i.test(issue)) return prefix + 'Consumers are reporting payments that were misapplied, delayed, not credited, or difficult to stop or verify.';
+  if(/communication|contact/i.test(issue)) return prefix + 'Consumers are reporting problems with how or when a company contacted them, including confusing, repeated, or unwanted contact.';
+  if(/fees?|interest/i.test(issue)) return prefix + 'Consumers are reporting charges, fees, interest, or pricing that they say was unexpected, incorrect, or poorly explained.';
+  if(/closing|escrow|servicing|mortgage/i.test(issue)) return prefix + 'These complaints relate to mortgage servicing, closing, escrow, payoff, or loan-administration problems.';
+  if(/fraud|scam|identity/i.test(issue)) return prefix + 'Consumers are reporting suspected fraud, identity theft, or transactions they say they did not authorize.';
+  return prefix + 'This is the CFPB issue category assigned to the complaint; it summarizes the consumer-reported problem without using private narrative text.';
 }
 
 class ComplaintMap3D{
